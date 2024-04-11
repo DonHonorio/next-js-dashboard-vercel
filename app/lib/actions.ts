@@ -22,7 +22,7 @@ const FormSchema = z.object({
 const CreateInvoice = FormSchema.omit({id: true, date: true});
 
 // Use Zod to update the expected types
-const UpdateInvoice = FormSchema.omit({ date: true });
+const UpdateInvoice = FormSchema.omit({id: true, date: true });
 
 // This is temporary until @types/react-dom is updated
 export type State = {
@@ -30,7 +30,6 @@ export type State = {
       customerId?: string[];
       amount?: string[];
       status?: string[];
-      pepe?: string[];
     };
     message?: string | null;
   };
@@ -73,12 +72,11 @@ export type State = {
     redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(prevState: State, formData: FormData) {
+export async function updateInvoice(id: string, prevState: State, formData: FormData) {
     const validatedFields = UpdateInvoice.safeParse({
       customerId: formData.get('customerId'),
       amount: formData.get('amount'),
       status: formData.get('status'),
-      id: formData.get('id'),
     });
 
     // If form validation fails, return errors early. Otherwise, continue.
@@ -90,7 +88,7 @@ export async function updateInvoice(prevState: State, formData: FormData) {
     }
 
     // Prepare data for insertion into the database
-    const { customerId, amount, status, id } = validatedFields.data;
+    const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
